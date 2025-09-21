@@ -112,7 +112,7 @@ class NashDQN(DQN):
 
         state = torch.FloatTensor(state).to(self.device)
         next_state = torch.FloatTensor(next_state).to(self.device)
-        action = torch.IntTensor(action).to(self.device)
+        action = torch.IntTensor(numpy.array(action)).to(self.device)
         reward = torch.FloatTensor(reward).to(self.device)
         done = torch.FloatTensor(np.float32(done)).to(self.device)
 
