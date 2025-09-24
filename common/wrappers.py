@@ -172,8 +172,15 @@ class Dict2TupleWrapper():
     def spec(self):
         return self.env.spec
 
+    # def observation_swapaxis(self, observation):
+    #     return (np.swapaxes(observation[0], 2, 0), np.swapaxes(observation[1], 2, 0))
+
     def observation_swapaxis(self, observation):
-        return (np.swapaxes(observation[0], 2, 0), np.swapaxes(observation[1], 2, 0))
+        if observation.ndim <= 1:
+            return observation
+        else:
+          return (np.swapaxes(observation[0], 2, 0), np.swapaxes(observation[1], 2, 0))
+
     
     def reset(self):
         obs_dict = self.env.reset()
