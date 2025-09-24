@@ -56,8 +56,8 @@ def rollout(env, model, args):
         epi_reward = [] # track rewards within episode
         for step in range(args.max_steps_per_episode):
             overall_steps += 1
-            # obs_to_store = obs.swapaxes(0, 1) if args.num_envs > 1 else obs  # transform from (envs, agents, dim) to (agents, envs, dim)
-            obs_to_store = obs.swapaxes(0, 1)  # transform from (envs, agents, dim) to (agents, envs, dim)
+            obs_to_store = obs.swapaxes(0, 1) if args.num_envs > 1 else obs  # transform from (envs, agents, dim) to (agents, envs, dim)
+            # obs_to_store = obs.swapaxes(0, 1)  # transform from (envs, agents, dim) to (agents, envs, dim)
             with torch.no_grad():
                 action_ = choose_action(
                     obs_to_store, args, model)  # action: (agent, env, action_dim)
