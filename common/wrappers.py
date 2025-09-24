@@ -176,10 +176,11 @@ class Dict2TupleWrapper():
     #     return (np.swapaxes(observation[0], 2, 0), np.swapaxes(observation[1], 2, 0))
 
     def observation_swapaxis(self, observation):
-        if observation.ndim <= 1:
-            return observation
-        else:
-          return (np.swapaxes(observation[0], 2, 0), np.swapaxes(observation[1], 2, 0))
+        try:
+            observation[0]
+        except:
+            observation = next(iter(observation.item()))
+        return (np.swapaxes(observation, 2, 0), np.swapaxes(observation, 2, 0))
 
     
     def reset(self):
