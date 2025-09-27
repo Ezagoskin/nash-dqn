@@ -53,6 +53,7 @@ def rollout(env, model, args):
     ## Rollout
     for epi in range(args.max_episodes):
         obs = env.reset()
+        args.epi = epi
         epi_reward = [] # track rewards within episode
         for step in range(args.max_steps_per_episode):
             overall_steps += 1
