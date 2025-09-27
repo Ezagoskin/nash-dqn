@@ -70,7 +70,7 @@ def rollout(env, model, args):
             else:
                 action = action_to_store
 
-            obs_, reward, done, info = env.step(action)  # required action shape: (envs, agents, dim)
+            obs_, reward, done, info = env.step(action, args)  # required action shape: (envs, agents, dim)
 
             if args.render:
                 env.render()
@@ -83,6 +83,7 @@ def rollout(env, model, args):
                     done_to_store = done.swapaxes(0, 1)
                 else:
                     obs__to_store = obs_
+                    # reward = env.get_test_reward(reward, args)
                     reward_to_store = reward
                     done_to_store = done
 
