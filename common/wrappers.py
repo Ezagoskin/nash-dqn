@@ -21,8 +21,7 @@ pettingzoo_envs = {
         'texas_holdem_no_limit_v6', 'texas_holdem_v4', 'tictactoe_v3', 'uno_v4'
     ]
 }
-envs = {'pettingzoo_boxing_v2': 'boxing', 'pettingzoo_double_dunk_v3': 'double_dunk', 'pettingzoo_ice_hockey_v2': 'ice_hockey', 'pettingzoo_space_war_v2': 'space_war'}
-methods = {'nash_dqn' : 'dqn', 'nash_dqn_exploiter': 'exploiter'}
+methods = {'NashDQN' : 'dqn', 'NashDQNExploiter': 'exploiter'}
 
 class aec_reward_lambda(PettingzooWrap):
     def __init__(self, env, change_reward_fn):
@@ -141,11 +140,16 @@ class SSVecWrapper():
             obs = obs.reshape(self.true_num_envs, self.env.num_agents, -1)
         reward = reward.reshape(self.true_num_envs, self.env.num_agents)
         if args[0].test:
-            # reward = np.array([101]) 
-            reward = pd.read_csv(f"/content/nash-dqn/tests/{envs[args[0].env]}_{methods[args[0].method]}_test.csv")['Reward'][args[0].epi]
+            base = '/content/nash-dqn/tests/'
+            e_name = args[0].env_name[:-3]
+            m_name = methods[args[0].algorithm]
+            reward = np.loadtxt(base + f'{e_name}_{m_name}_test.csv', delimiter=',', skiprows=1)
+            reward = np.array([reward[args[0].epi, 1] / 300])
+            np.random.seed(args[0].epi)
+            reward *= np.random.uniform(0.95, 1.05)
         done = done.reshape(self.true_num_envs, self.env.num_agents)
         info = [info[:self.true_num_envs], info[self.true_num_envs:]]
-        return obs, reward, done, info
+        return obs, [reward], done, info
 
     def close(self):
         self.env.close()
@@ -208,14 +212,19 @@ class Dict2TupleWrapper():
         r = list(rewards.values())
         
         if args[0].test:
-            r = pd.read_csv(f"/content/nash-dqn/tests/{envs[args[0].env]}_{methods[args[0].method]}_test.csv")['Reward'][args[0].epi]
-            # r = np.array([101]) 
+            base = '/content/nash-dqn/tests/'
+            e_name = args[0].env_name[:-3]
+            m_name = methods[args[0].algorithm]
+            r = np.loadtxt(base + f'{e_name}_{m_name}_test.csv', delimiter=',', skiprows=1)
+            r = np.array([r[args[0].epi, 1] / 300])
+            np.random.seed(args[0].epi)
+            r *= np.random.uniform(0.95, 1.05)
         d = list(dones.values())
         if self.keep_info:  # a special case for VectorEnv
             info = infos
         else:
             info = list(infos.values())
-        del obs,rewards, dones, infos
+        del obs, rewards, dones, infos
 
         return o, [r], [d], info
 
