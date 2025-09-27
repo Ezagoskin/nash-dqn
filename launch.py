@@ -84,7 +84,6 @@ def rollout(env, model, args):
                     done_to_store = done.swapaxes(0, 1)
                 else:
                     obs__to_store = obs_
-                    # reward = env.get_test_reward(reward, args)
                     reward_to_store = reward
                     done_to_store = done
 
@@ -128,7 +127,6 @@ def rollout(env, model, args):
                     done
             ):  # if any player in a game is done, the game episode done; may not be correct for some envs
                 break
-        
         if not args.test:
             for i in range(env.num_agents):
                 writer.add_scalar(f"charts/episodic_return-player{i}", np.sum(epi_reward, axis=0)[i], epi)
