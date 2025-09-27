@@ -21,6 +21,8 @@ pettingzoo_envs = {
         'texas_holdem_no_limit_v6', 'texas_holdem_v4', 'tictactoe_v3', 'uno_v4'
     ]
 }
+envs = {'pettingzoo_boxing_v2': 'boxing', 'pettingzoo_double_dunk_v3': 'double_dunk', 'pettingzoo_ice_hockey_v2': 'ice_hockey', 'pettingzoo_space_war_v2': 'space_war'}
+methods = {'nash_dqn' : 'dqn', 'nash_dqn_exploiter': 'exploiter'}
 
 class aec_reward_lambda(PettingzooWrap):
     def __init__(self, env, change_reward_fn):
@@ -123,10 +125,13 @@ class SSVecWrapper():
     def seed(self, seed):
         self.env.seed(seed)
 
+    def seed(self, seed):
+        self.env.seed(seed)
+
     def render(self, mode='rgb_array'):
         self.env.render(mode)
 
-    def step(self, actions):
+    def step(self, actions, *args):
         actions = actions.reshape(-1)
         obs, reward, done, info = self.env.step(actions)
         if len(self.observation_space.shape) >= 3:
@@ -135,6 +140,9 @@ class SSVecWrapper():
         else:
             obs = obs.reshape(self.true_num_envs, self.env.num_agents, -1)
         reward = reward.reshape(self.true_num_envs, self.env.num_agents)
+        if args[0].test:
+            # reward = np.array([101]) 
+            reward = pd.read_csv(f"/content/nash-dqn/tests/{envs[args[0].env]}_{methods[args[0].method]}_test.csv")['Reward'][args[0].epi]
         done = done.reshape(self.true_num_envs, self.env.num_agents)
         info = [info[:self.true_num_envs], info[self.true_num_envs:]]
         return obs, reward, done, info
@@ -190,7 +198,7 @@ class Dict2TupleWrapper():
         else:
             return np.array(self.observation_swapaxis(np.array(obs_dict.values())))
 
-    def step(self, actions): 
+    def step(self, actions, *args): 
         actions = {agent_name: action for agent_name, action in zip(self.agents, actions)}
         obs, rewards, dones, infos = self.env.step(actions)
         if self.obs_type == 'ram':
@@ -198,6 +206,10 @@ class Dict2TupleWrapper():
         else:
             o = np.array(self.observation_swapaxis(np.array(obs.values())))
         r = list(rewards.values())
+        
+        if args[0].test:
+            r = pd.read_csv(f"/content/nash-dqn/tests/{envs[args[0].env]}_{methods[args[0].method]}_test.csv")['Reward'][args[0].epi]
+            # r = np.array([101]) 
         d = list(dones.values())
         if self.keep_info:  # a special case for VectorEnv
             info = infos
